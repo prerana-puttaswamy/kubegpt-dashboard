@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KubeGPT Dashboard</title>
+  <style>
+    :root {
+      --bg: #081122;
+      --panel: rgba(15, 23, 42, 0.88);
+      --border: #243248;
+      --text: #e5eefc;
+      --muted: #93a4bd;
+      --accent: #3b82f6;
+      --accent-2: #60a5fa;
+      --green-bg: #123524;
+      --green-text: #bbf7d0;
+      --red-bg: #4c1515;
+      --red-text: #fecaca;
+      --amber-bg: #4a2f0f;
+      --amber-text: #fde68a;
+      --slate-bg: #1e293b;
+      --slate-text: #dbeafe;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(14,165,233,0.12), transparent 25%),
+        linear-gradient(180deg, #081122 0%, #0b1326 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .hero-left h1 {
+      margin: 0;
+      font-size: 44px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-left p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .hero-caption {
+      margin: 10px 0 0;
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid var(--border);
+      color: var(--slate-text);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .top-controls {
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    label {
+      font-weight: 700;
+      color: #d8e6fb;
+    }
+
+    input {
+      min-width: 220px;
+      background: #09111f;
+      border: 1px solid #334155;
+      color: white;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 3px rgba(96,165,250,0.12);
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-secondary {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      min-height: 110px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .stat-sub {
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .section {
+      padding: 20px;
+    }
+
+    .section h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 14px 10px;
+      border-bottom: 1px solid #223047;
+      vertical-align: middle;
+      font-size: 13px;
+    }
+
+    th {
+      color: #93c5fd;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 46%;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      width: 20%;
+      white-space: nowrap;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3) {
+      width: 10%;
+      white-space: nowrap;
+    }
+
+    th:nth-child(4),
+    td:nth-child(4) {
+      width: 24%;
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr.active-row {
+      background: rgba(59, 130, 246, 0.08);
+    }
+
+    .pod-name {
+      font-weight: 700;
+      color: #eef6ff;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      line-height: 1.35;
+    }
+
+    td:last-child button {
+      min-width: 86px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+
+    .status-badge,
+    .severity-badge,
+    .meta-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      white-space: nowrap;
+    }
+
+    .status-running, .severity-low {
+      background: var(--green-bg);
+      color: var(--green-text);
+    }
+
+    .status-error, .severity-high {
+      background: var(--red-bg);
+      color: var(--red-text);
+    }
+
+    .status-warn, .severity-medium {
+      background: var(--amber-bg);
+      color: var(--amber-text);
+    }
+
+    .meta-badge {
+      background: var(--slate-bg);
+      color: var(--slate-text);
+      border: 1px solid #334155;
+    }
+
+    .analysis-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .loading {
+      min-height: 24px;
+      color: #93c5fd;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .analysis-empty {
+      background: #07101d;
+      border: 1px dashed #314156;
+      border-radius: 16px;
+      padding: 24px;
+      color: var(--muted);
+    }
+
+    .analysis-meta {
+      margin-bottom: 16px;
+      color: #dce8fb;
+      font-size: 14px;
+    }
+
+    .cards-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .result-card {
+      background: #07101d;
+      border: 1px solid #243248;
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .result-card h3 {
+      margin: 0 0 12px;
+      color: #8ec5ff;
+      font-size: 18px;
+    }
+
+    .result-card p,
+    .result-card li {
+      line-height: 1.65;
+      color: #edf4ff;
+      font-size: 15px;
+    }
+
+    .result-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .raw-section {
+      margin-top: 16px;
+    }
+
+    .raw-box {
+      white-space: pre-wrap;
+      line-height: 1.55;
+      background: #09111f;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 16px;
+      color: #cbd5e1;
+      max-height: 280px;
+      overflow-y: auto;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .small-muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1100px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-left h1 {
+        font-size: 34px;
+      }
+
+      .controls-row {
+        align-items: stretch;
+      }
+
+      input, button {
+        width: 100%;
+      }
+
+      th, td {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <div class="hero-left">
+        <h1>KubeGPT Dashboard</h1>
+        <p>Hybrid AI assistant for Kubernetes failure diagnosis</p>
+        <p class="hero-caption">Real-time Kubernetes troubleshooting powered by hybrid AI</p>
+        <div class="hero-badges">
+          <span class="pill">Hybrid Rules + LLM</span>
+          <span class="pill">FastAPI + Kubernetes</span>
+          <span class="pill">Local Ollama Inference</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel top-controls">
+      <div class="controls-row">
+        <label for="namespace">Namespace</label>
+        <input id="namespace" value="default" />
+        <button class="btn-primary" onclick="loadPods()">Refresh Pods</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="panel stat-card">
+        <div class="stat-label">Total Pods</div>
+        <div class="stat-value" id="totalPods">0</div>
+        <div class="stat-sub">Currently discovered in namespace</div>
+      </div>
+      <div class="panel stat-card">
+        <div class="stat-label">Healthy Pods</div>
+        <div class="stat-value" id="healthyPods">0</div>
+        <div class="stat-sub">Pods in healthy running state</div>
+      </div>
+      <div class="panel stat-card">
+        <div class="stat-label">Failing Pods</div>
+        <div class="stat-value" id="failingPods">0</div>
+        <div class="stat-sub">Pods needing investigation</div>
+      </div>
+      <div class="panel stat-card">
+        <div class="stat-label">Last Analysis</div>
+        <div class="stat-value" id="lastLatency">--</div>
+        <div class="stat-sub">Most recent analysis latency</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="panel section">
+        <h2>Pods</h2>
+        <div class="section-sub">
+          Click Analyze to inspect a pod using kubectl diagnostics, deterministic rules, and local LLM fallback.
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Pod Name</th>
+                <th>Status</th>
+                <th>Restarts</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="podsTableBody">
+              <tr><td colspan="4">Loading pods...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="footer-note">
+          Tip: Use failure cases like CrashLoopBackOff or ImagePullBackOff to demo the dashboard clearly.
+        </div>
+      </div>
+
+      <div class="panel section">
+        <h2>Analysis Result</h2>
+        <div class="analysis-actions">
+          <button class="btn-secondary" onclick="copyAnalysis()">Copy Analysis</button>
+          <button id="toggleRawBtn" class="btn-secondary" onclick="toggleRaw()">Show Raw Logs</button>
+        </div>
+
+        <div id="loading" class="loading"></div>
+
+        <div id="analysisContent" class="analysis-empty">
+          No analysis yet. Select a pod and click <strong>Analyze</strong>.
+        </div>
+
+        <div id="rawSection" class="raw-section hidden">
+          <div class="cards-stack">
+            <div class="result-card">
+              <h3>Raw Describe Snippet</h3>
+              <div id="describeSnippet" class="raw-box"></div>
+            </div>
+            <div class="result-card">
+              <h3>Raw Logs Snippet</h3>
+              <div id="logsSnippet" class="raw-box"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let latestAnalysisText = "";
+
+    function getStatusClass(status) {
+      const s = (status || "").toLowerCase();
+      if (s.includes("running")) return "status-running";
+      if (s.includes("crashloop") || s.includes("imagepull") || s.includes("err")) return "status-error";
+      return "status-warn";
+    }
+
+    function getSeverityClass(severity) {
+      const s = (severity || "").toLowerCase();
+      if (s === "high") return "severity-high";
+      if (s === "medium") return "severity-medium";
+      return "severity-low";
+    }
+
+    function renderList(items) {
+      if (!items || !items.length) return `<p class="small-muted">No data.</p>`;
+      return `<ul>${items.map(item => `<li>${item}</li>`).join("")}</ul>`;
+    }
+
+    function updateStats(pods) {
+      const total = pods.length;
+      const healthy = pods.filter(p => (p.status || "").toLowerCase() === "running").length;
+      const failing = total - healthy;
+
+      document.getElementById("totalPods").textContent = total;
+      document.getElementById("healthyPods").textContent = healthy;
+      document.getElementById("failingPods").textContent = failing;
+    }
+
+    function setActiveRow(buttonId) {
+      document.querySelectorAll("#podsTableBody tr").forEach(row => {
+        row.classList.remove("active-row");
+      });
+
+      const button = document.getElementById(buttonId);
+      if (button) {
+        const row = button.closest("tr");
+        if (row) {
+          row.classList.add("active-row");
+        }
+      }
+    }
+
+    async function loadPods() {
+      const namespace = document.getElementById("namespace").value.trim() || "default";
+      const tbody = document.getElementById("podsTableBody");
+      tbody.innerHTML = `<tr><td colspan="4">Loading pods...</td></tr>`;
+
+      try {
+        const res = await fetch(`/pods?namespace=${encodeURIComponent(namespace)}`);
+        const data = await res.json();
+
+        if (!data.pods || data.pods.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4">No pods found.</td></tr>`;
+          updateStats([]);
+          return;
+        }
+
+        updateStats(data.pods);
+
+        tbody.innerHTML = data.pods.map((pod, index) => `
+          <tr>
+            <td class="pod-name">${pod.name}</td>
+            <td><span class="status-badge ${getStatusClass(pod.status)}">${pod.status}</span></td>
+            <td>${pod.restarts}</td>
+            <td>
+              <button class="btn-primary" id="analyze-btn-${index}" onclick="analyzePod('${pod.name}', '${pod.namespace}', 'analyze-btn-${index}')">
+                Analyze
+              </button>
+            </td>
+          </tr>
+        `).join("");
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4">Failed to load pods.</td></tr>`;
+        updateStats([]);
+      }
+    }
+
+    async function analyzePod(podName, namespace, buttonId) {
+      setActiveRow(buttonId);
+
+      const rawSection = document.getElementById("rawSection");
+      const toggleRawBtn = document.getElementById("toggleRawBtn");
+      rawSection.classList.add("hidden");
+      toggleRawBtn.textContent = "Show Raw Logs";
+
+      const loading = document.getElementById("loading");
+      const analysisContent = document.getElementById("analysisContent");
+      const describeSnippet = document.getElementById("describeSnippet");
+      const logsSnippet = document.getElementById("logsSnippet");
+      const button = document.getElementById(buttonId);
+
+      loading.textContent = `Analyzing ${podName}... please wait`;
+      analysisContent.innerHTML = "";
+      if (button) button.disabled = true;
+
+      try {
+        const res = await fetch(`/analyze?pod_name=${encodeURIComponent(podName)}&namespace=${encodeURIComponent(namespace)}`);
+        const data = await res.json();
+
+        if (data.detail) {
+          analysisContent.innerHTML = `<div class="analysis-empty">Error: ${data.detail}</div>`;
+          return;
+        }
+
+        const a = data.analysis;
+
+        latestAnalysisText = `
+Pod: ${data.pod_name}
+Namespace: ${data.namespace}
+Severity: ${data.severity}
+Latency (${data.latency_type}): ${data.latency}s
+Source: ${a.source}
+Confidence: ${a.confidence}
+
+Issue:
+${a.issue}
+
+Root Cause:
+${a.root_cause}
+
+Evidence:
+- ${(a.evidence || []).join("\n- ")}
+
+Recommended Fix:
+- ${(a.recommended_fix || []).join("\n- ")}
+        `.trim();
+
+        document.getElementById("lastLatency").textContent =
+          data.latency_type === "instant" ? "Instant" : `${data.latency}s`;
+
+        analysisContent.className = "";
+        analysisContent.innerHTML = `
+          <div class="analysis-meta">
+            <strong>Pod:</strong> ${data.pod_name}<br>
+            <strong>Namespace:</strong> ${data.namespace}
+          </div>
+
+          <div>
+            <span class="severity-badge ${getSeverityClass(data.severity)}">Severity: ${data.severity}</span>
+            <span class="meta-badge">Latency (${data.latency_type}): ${data.latency}s</span>
+            <span class="meta-badge">Source: ${a.source}</span>
+            <span class="meta-badge">Confidence: ${a.confidence}</span>
+          </div>
+
+          <div class="cards-stack">
+            <div class="result-card">
+              <h3>Issue</h3>
+              <p>${a.issue || "No data."}</p>
+            </div>
+
+            <div class="result-card">
+              <h3>Root Cause</h3>
+              <p>${a.root_cause || "No data."}</p>
+            </div>
+
+            <div class="result-card">
+              <h3>Evidence</h3>
+              ${renderList(a.evidence)}
+            </div>
+
+            <div class="result-card">
+              <h3>Recommended Fix</h3>
+              ${renderList(a.recommended_fix)}
+            </div>
+          </div>
+        `;
+
+        describeSnippet.textContent = data.describe_snippet || "No describe output available.";
+        logsSnippet.textContent = data.logs_snippet || "No log output available.";
+      } catch (err) {
+        analysisContent.innerHTML = `<div class="analysis-empty">Failed to analyze pod.</div>`;
+      } finally {
+        loading.textContent = "";
+        if (button) button.disabled = false;
+      }
+    }
+
+    function toggleRaw() {
+      const rawSection = document.getElementById("rawSection");
+      const button = document.getElementById("toggleRawBtn");
+      const isHidden = rawSection.classList.contains("hidden");
+
+      if (isHidden) {
+        rawSection.classList.remove("hidden");
+        button.textContent = "Hide Raw Logs";
+        rawSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        rawSection.classList.add("hidden");
+        button.textContent = "Show Raw Logs";
+      }
+    }
+
+    async function copyAnalysis() {
+      if (!latestAnalysisText) {
+        alert("No analysis available to copy");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(latestAnalysisText);
+        alert("Analysis copied to clipboard");
+      } catch (err) {
+        alert("Failed to copy analysis");
+      }
+    }
+
+    loadPods();
+  </script>
+</body>
+</html>
