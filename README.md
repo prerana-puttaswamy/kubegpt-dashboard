@@ -132,29 +132,37 @@ kubegpt/
 
 ├── app/
 
-│   ├── main.py
+│ ├── main.py
 
-│   ├── collector.py
+│ ├── collector.py
 
-│   ├── analyzer.py
+│ ├── analyzer.py
 
-│   ├── heuristics.py
+│ ├── heuristics.py
 
-│   └── index.html
+│ └── index.html
 
 ├── manifests/
 
-│   ├── badimage.yaml
+│ ├── badimage.yaml
 
-│   ├── crashloop.yaml
+│ ├── crashloop.yaml
 
-│   └── probe.yaml
+│ └── probe.yaml
+
+├── screenshots/
+
+│ ├── dashboard.png
+
+│ ├── imagepull-overview.png
+
+│ ├── imagepull-details.png
+
+│ └── crashloop-analysis.png
 
 ├── .gitignore
 
 └── README.md
-
-
 
 \---
 
@@ -243,4 +251,34 @@ Kubernetes debugging often requires manually reading verbose logs and system sta
 
 
 Prerana Puttaswamy
+
+---
+
+
+
+\## Screenshots
+
+
+
+\### Dashboard
+
+!\[Dashboard](screenshots/dashboard.png)
+
+
+
+\### Image Pull Error (Overview)
+
+!\[Image Pull Overview](screenshots/imagepull-overview.png)
+
+
+
+\### Image Pull Error (Detailed Analysis)
+
+!\[Image Pull Details](screenshots/imagepull-details.png)
+
+
+
+\### CrashLoopBackOff Analysis
+
+!\[CrashLoop Analysis](screenshots/crashloop-analysis.png)
 
