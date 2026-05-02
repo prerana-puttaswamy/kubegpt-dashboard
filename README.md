@@ -63,22 +63,23 @@ Frontend Dashboard
 
 ## Project Structure
 
+```text
 kubegpt/
 ├── app/
-│ ├── main.py
-│ ├── collector.py
-│ ├── analyzer.py
-│ ├── heuristics.py
-│ └── index.html
+│   ├── main.py
+│   ├── collector.py
+│   ├── analyzer.py
+│   ├── heuristics.py
+│   └── index.html
 ├── manifests/
-│ ├── badimage.yaml
-│ ├── crashloop.yaml
-│ └── probe.yaml
+│   ├── badimage.yaml
+│   ├── crashloop.yaml
+│   └── probe.yaml
 ├── screenshots/
-│ ├── dashboard.png
-│ ├── imagepull-overview.png
-│ ├── imagepull-details.png
-│ └── crashloop-analysis.png
+│   ├── dashboard.png
+│   ├── imagepull-overview.png
+│   ├── imagepull-details.png
+│   └── crashloop-analysis.png
 ├── .gitignore
 └── README.md
 ---
