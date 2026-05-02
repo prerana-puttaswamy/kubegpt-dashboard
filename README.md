@@ -82,6 +82,8 @@ kubegpt/
 │   └── crashloop-analysis.png
 ├── .gitignore
 └── README.md
+```
+
 ---
 
 ## How It Works
